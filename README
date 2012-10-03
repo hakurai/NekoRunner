@@ -1,0 +1,2 @@
+mvn -Pexample test
+
