@@ -1,10 +1,9 @@
 package net.hogedriven.junit.nekorunner;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.imageio.ImageIO;
@@ -12,6 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 import org.junit.runner.Description;
 import org.junit.runner.Runner;
@@ -25,8 +25,7 @@ public class NekoRunner extends Runner {
 
     private static JFrame frame;
 
-    private static final ScheduledExecutorService executor = Executors
-        .newSingleThreadScheduledExecutor();
+    private static Timer timer;
 
     private static boolean initialized;
 
@@ -57,7 +56,6 @@ public class NekoRunner extends Runner {
         }
         runner.run(notifier);
         if (testCount.decrementAndGet() == 0) {
-            executor.shutdownNow();
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -75,31 +73,30 @@ public class NekoRunner extends Runner {
         final ImageIcon icon1 =
             new ImageIcon(ImageIO.read(getClass().getResource("neko1.jpg")));
         final JLabel neko = new JLabel(icon0);
-        executor.scheduleAtFixedRate(new Runnable() {
+
+        timer = new Timer(100, new ActionListener() {
 
             private boolean b;
 
             @Override
-            public void run() {
+            public void actionPerformed(ActionEvent e) {
                 final ImageIcon icon = b ? icon0 : icon1;
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        neko.setIcon(icon);
-                    }
-                });
+                neko.setIcon(icon);
                 b = !b;
             }
-        }, 500L, 100L, TimeUnit.MILLISECONDS);
+        });
 
         frame = new JFrame();
         frame.add(neko, BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
+        timer.start();
     }
 
     private void destroy() {
+        if (timer != null) {
+            timer.stop();
+        }
         if (frame != null) {
             frame.dispose();
         }
