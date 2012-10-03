@@ -1,0 +1,11 @@
+task mvn {
+  'mvn'.execute()
+}
+
+task mvnEclipse {
+  'mvn eclipse:eclipse'.execute()
+}
+
+task showExample {
+  'mvn -Pexample test'.execute()
+}
