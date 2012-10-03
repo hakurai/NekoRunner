@@ -94,7 +94,7 @@ public class NekoRunner extends Runner {
         }, 500L, 100L, TimeUnit.MILLISECONDS);
 
         frame = new JFrame();
-        frame.getContentPane().add(neko, BorderLayout.CENTER);
+        frame.add(neko, BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
     }
